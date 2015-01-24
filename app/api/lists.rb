@@ -15,7 +15,9 @@ module Lists
       end
 
       segment '/:name' do
-
+        get do
+          List.find_by name: params[:name]
+        end
         resources :items do
           params do
             requires :description, type: String, desc: "Your item's description."

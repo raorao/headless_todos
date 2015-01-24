@@ -2,6 +2,8 @@ require "rails_helper"
 
 
 describe Lists::API do
+  let(:list) {List.create name: 'list_name'}
+  let(:item) {list.items.create description: 'item_description', completed: false}
 
   describe 'POST /lists' do
     it "creates a new list" do
@@ -24,9 +26,15 @@ describe Lists::API do
     end
   end
 
-  describe 'POST /lists/:name/item' do
-    let(:list) {List.create name: 'list_name'}
+  describe 'GET /lists/:name' do
+    it "returns a json representation of the list and its associated items" do
+      list.items.create description: 'some description', completed: false
+      get "/lists/#{list.name}"
+      expect(response.body).to eq list.to_json
+    end
+  end
 
+  describe 'POST /lists/:name/item' do
     it 'creates a new item for the associated list' do
       expect {
         post "/lists/#{list.name}/items", {description: 'some description', completed: false }
@@ -40,13 +48,10 @@ describe Lists::API do
   end
 
   describe 'PUT /lists/:name/items/:item_id' do
-    let(:list) {List.create name: 'list_name'}
-    let(:item) {list.items.create description: 'item_description', completed: false}
-
     it 'updates the specified item' do
       put "/lists/#{list.name}/items/#{item.id}", {completed: true}
       item.reload
-      expect(item.completed).to equal true
+      expect(item.completed).to eq true
     end
 
     it 'returns a json representation of the item' do
@@ -57,9 +62,6 @@ describe Lists::API do
   end
 
   describe 'PUT /lists/:name/items/:item_id' do
-    let(:list) {List.create name: 'list_name'}
-    let(:item) {list.items.create description: 'item_description', completed: false}
-
     it 'updates the specified item' do
       expect {
         delete "/lists/#{list.name}/items/#{item.id}"

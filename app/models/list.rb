@@ -8,4 +8,8 @@ class List < ActiveRecord::Base
       errors.add(:name, "must be URI encodable")
     end
   end
+
+  def as_json(options={})
+    super except: :id, methods: :items
+  end
 end
