@@ -23,4 +23,14 @@ describe Lists::API do
       end
     end
   end
+
+  describe 'POST /lists/:name/item' do
+    let(:list) {List.create name: 'list_name'}
+
+    it 'creates a new item for the associated list' do
+      expect {
+        post "/lists/#{list.name}/items", {description: 'some description', completed: false }
+      }.to change{ Item.count }.by 1
+    end
+  end
 end
