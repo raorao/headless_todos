@@ -32,6 +32,11 @@ describe Lists::API do
         post "/lists/#{list.name}/items", {description: 'some description', completed: false }
       }.to change{ Item.count }.by 1
     end
+
+    it 'returns a json representation of the item' do
+      post "/lists/#{list.name}/items", {description: 'some description', completed: false }
+      expect(response.body).to eq Item.last.to_json
+    end
   end
 
   describe 'PUT /lists/:name/items/:item_id' do
@@ -43,6 +48,12 @@ describe Lists::API do
       item.reload
       expect(item.completed).to equal true
     end
+
+    it 'returns a json representation of the item' do
+      put "/lists/#{list.name}/items/#{item.id}", {completed: true}
+      expect(response.body).to eq item.reload.to_json
+    end
+
   end
 
   describe 'PUT /lists/:name/items/:item_id' do

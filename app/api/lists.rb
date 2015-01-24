@@ -1,5 +1,7 @@
 module Lists
   class API < Grape::API
+    format :json
+
     resource :lists do
 
       params { requires :name, type: String, desc: "Your list's name." }
@@ -40,6 +42,7 @@ module Lists
             new_attributes[:description] = params[:description] if params[:description]
             new_attributes[:completed]   = params[:completed]   if params[:completed]
             item.update_attributes new_attributes
+            item.reload
           end
 
           delete '/:item_id' do
