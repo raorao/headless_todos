@@ -1,0 +1,16 @@
+%h1
+  This is website, but not for your browser!
+
+%p
+  This is an API, meant to be used in conjunction with another app. Here's how to use it!
+
+%dl
+  %dt visit POST /lists to create a new list. In the body of your request, include a 'name' parameter so you can idenitify it later!
+  %dt visit GET /lists/:list_name to get all items for a list.
+  %dt visit POST /lists/:list_name/items to create a new item. In the body of your request, include 'description' and 'completed' parameters.
+  %dt visit UPDATE /lists/:list_name/items/:item_name to update an item. Include the parameters you want to update (either 'description' or 'completed').
+  %dt visit DELETE /lists/:list_name/items/:item_name to delete the specified item.
+
+%p
+  Whenever you see :list_name, replace it with the name of the list you provided. Whenever you see :item_id, replace it with the id of the item you want to update or delete.
+
