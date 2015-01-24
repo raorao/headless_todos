@@ -10,7 +10,7 @@ describe Lists::API do
       expect { post '/lists', {name: 'list-name'} }.to change{ List.count }.by 1
     end
 
-    describe 'if a list with the same name already exists' do
+    describe 'if a list is invalid' do
       before(:each) do
         List.create name: 'non-unique-name'
       end
@@ -19,7 +19,7 @@ describe Lists::API do
         expect { post '/lists', {name: 'non-unique-name'} }.to change{ List.count }.by 0
       end
 
-      it "returns a 500 status error" do
+      it "returns a 422 status code" do
         post '/lists', {name: 'non-unique-name'}
         expect(response.status).to eq 422
       end
@@ -31,6 +31,11 @@ describe Lists::API do
       list.items.create description: 'some description', completed: false
       get "/lists/#{list.name}"
       expect(response.body).to eq list.to_json
+    end
+
+    it "returns a 422 if the list could not be found" do
+       get "/lists/bad_name"
+       expect(response.status).to eq 422
     end
   end
 
@@ -44,6 +49,11 @@ describe Lists::API do
     it 'returns a json representation of the item' do
       post "/lists/#{list.name}/items", {description: 'some description', completed: false }
       expect(response.body).to eq Item.last.to_json
+    end
+
+    it "returns a 422 if the list could not be found" do
+      post "/lists/bad_list/items", {description: 'some description', completed: false }
+      expect(response.status).to eq 422
     end
   end
 
@@ -59,6 +69,10 @@ describe Lists::API do
       expect(response.body).to eq item.reload.to_json
     end
 
+    it "returns a 422 if the list could not be found" do
+      put "/lists/bad_list/items/#{item.id}", {completed: true}
+      expect(response.status).to eq 422
+    end
   end
 
   describe 'PUT /lists/:name/items/:item_id' do
@@ -66,6 +80,11 @@ describe Lists::API do
       expect {
         delete "/lists/#{list.name}/items/#{item.id}"
         }.to change{Item.count}.by 0
+    end
+
+    it "returns a 422 if the list could not be found" do
+      delete "/lists/bad_list/items/#{item.id}"
+      expect(response.status).to eq 422
     end
   end
 

@@ -4,19 +4,24 @@ module Lists
 
     resource :lists do
 
+      helpers do
+        def fetch_list
+          @list = List.find_by name: params[:name]
+          error!({errors: ["Could not find List with name #{params[:name]}"]}, 422) unless @list
+        end
+      end
+
       params { requires :name, type: String, desc: "Your list's name." }
       post do
         list = List.create name: params[:name]
-        if list.valid?
-          status 201
-        else
-          status 422
-        end
+        error!({errors: list.errors.full_messages}, 422) unless list.valid?
+        list
       end
 
       segment '/:name' do
         get do
-          List.find_by name: params[:name]
+          fetch_list
+          @list
         end
         resources :items do
           params do
@@ -25,8 +30,8 @@ module Lists
           end
 
           post do
-            list = List.find_by name: params[:name]
-            list.items.create({
+            fetch_list
+            @list.items.create({
               description: params[:description],
               completed: params[:completed]
             })
@@ -39,6 +44,7 @@ module Lists
               optional :completed, type: Boolean, desc: "Your item's completeness value."
             end
 
+            fetch_list
             item = Item.find params[:item_id]
             new_attributes = {}
             new_attributes[:description] = params[:description] if params[:description]
@@ -48,6 +54,7 @@ module Lists
           end
 
           delete '/:item_id' do
+            fetch_list
             Item.find(params[:item_id]).destroy
           end
         end
