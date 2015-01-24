@@ -33,4 +33,27 @@ describe Lists::API do
       }.to change{ Item.count }.by 1
     end
   end
+
+  describe 'PUT /lists/:name/items/:item_id' do
+    let(:list) {List.create name: 'list_name'}
+    let(:item) {list.items.create description: 'item_description', completed: false}
+
+    it 'updates the specified item' do
+      put "/lists/#{list.name}/items/#{item.id}", {completed: true}
+      item.reload
+      expect(item.completed).to equal true
+    end
+  end
+
+  describe 'PUT /lists/:name/items/:item_id' do
+    let(:list) {List.create name: 'list_name'}
+    let(:item) {list.items.create description: 'item_description', completed: false}
+
+    it 'updates the specified item' do
+      expect {
+        delete "/lists/#{list.name}/items/#{item.id}"
+        }.to change{Item.count}.by 0
+    end
+  end
+
 end

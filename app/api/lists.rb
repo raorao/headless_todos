@@ -13,6 +13,7 @@ module Lists
       end
 
       segment '/:name' do
+
         resources :items do
           params do
             requires :description, type: String, desc: "Your item's description."
@@ -25,6 +26,24 @@ module Lists
               description: params[:description],
               completed: params[:completed]
             })
+          end
+
+          put ':item_id' do
+
+            params do
+              optional :description, type: String, desc: "Your item's description."
+              optional :completed, type: Boolean, desc: "Your item's completeness value."
+            end
+
+            item = Item.find params[:item_id]
+            new_attributes = {}
+            new_attributes[:description] = params[:description] if params[:description]
+            new_attributes[:completed]   = params[:completed]   if params[:completed]
+            item.update_attributes new_attributes
+          end
+
+          delete '/:item_id' do
+            Item.find(params[:item_id]).destroy
           end
         end
       end
