@@ -9,6 +9,12 @@ module Lists
           @list = List.find_by name: params[:name]
           error!({errors: ["Could not find List with name #{params[:name]}"]}, 422) unless @list
         end
+
+        def fetch_item
+          @item = Item.find params[:item_id]
+        rescue ActiveRecord::RecordNotFound
+          error!({errors: ["Could not find Item with name #{params[:item]}"]}, 422)
+        end
       end
 
       params { requires :name, type: String, desc: "Your list's name." }
@@ -45,17 +51,18 @@ module Lists
             end
 
             fetch_list
-            item = Item.find params[:item_id]
+            fetch_item
             new_attributes = {}
             new_attributes[:description] = params[:description] if params[:description]
             new_attributes[:completed]   = params[:completed]   if params[:completed]
-            item.update_attributes new_attributes
-            item.reload
+            @item.update_attributes new_attributes
+            @item.reload
           end
 
           delete '/:item_id' do
             fetch_list
-            Item.find(params[:item_id]).destroy
+            fetch_item
+            @item.destroy
           end
         end
       end

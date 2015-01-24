@@ -73,9 +73,14 @@ describe Lists::API do
       put "/lists/bad_list/items/#{item.id}", {completed: true}
       expect(response.status).to eq 422
     end
+
+    it "returns a 422 if the item could not be found" do
+      put "/lists/#{list.name}/items/0", {completed: true}
+      expect(response.status).to eq 422
+    end
   end
 
-  describe 'PUT /lists/:name/items/:item_id' do
+  describe 'DELETE /lists/:name/items/:item_id' do
     it 'updates the specified item' do
       expect {
         delete "/lists/#{list.name}/items/#{item.id}"
@@ -84,6 +89,11 @@ describe Lists::API do
 
     it "returns a 422 if the list could not be found" do
       delete "/lists/bad_list/items/#{item.id}"
+      expect(response.status).to eq 422
+    end
+
+    it "returns a 422 if the item could not be found" do
+      delete "/lists/#{list.name}/items/0"
       expect(response.status).to eq 422
     end
   end
