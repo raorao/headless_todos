@@ -5,7 +5,12 @@ module Lists
         requires :name, type: String, desc: "Your list's name."
       end
       post do
-        List.create name: params[:name]
+        list = List.create name: params[:name]
+        if list.valid?
+          status 201
+        else
+          status 422
+        end
       end
     end
   end
