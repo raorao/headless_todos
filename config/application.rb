@@ -18,5 +18,11 @@ module HeadlessTodos
   class Application < Rails::Application
     config.autoload_paths += Dir[Rails.root.join('app', 'api', '*')]
     config.active_record.raise_in_transactional_callbacks = true
+    config.middleware.insert_before 0, "Rack::Cors" do
+      allow do
+        origins '*'
+        resource '*', :headers => :any, :methods => [:get, :post, :delete, :put]
+      end
+    end
   end
 end
